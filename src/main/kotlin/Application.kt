@@ -16,5 +16,4 @@ fun Application.module() {
     val taskRepository = TaskRepository(dataSource)
 
     configureRouting(taskRepository)
-
 }

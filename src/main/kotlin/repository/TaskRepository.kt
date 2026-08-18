@@ -9,19 +9,16 @@ class TaskRepository(
 
     fun create(description: String, done: Boolean): Task {
         val sql = """
-            INSERT INTO task (description, done)
+            INSERT INTO todo.task (description, done)
             VALUES (?, ?)
             RETURNING id, description, done
         """.trimIndent()
-
-        print("---->>> KERTTULII")
         
         dataSource.connection.use { connection ->
             connection.prepareStatement(sql).use { statement ->
                 statement.setString(1, description)
                 statement.setBoolean(2, done)
                 statement.executeQuery().use { result ->
-
                     result.next()
 
                     return Task(
