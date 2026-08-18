@@ -1,0 +1,13 @@
+### Create task
+
+POST http://localhost:8080/tasks
+Content-Type: application/json
+
+{
+  "description": "Opettele Ktoria",
+  "done": false
+}
+
+### Get tasks
+
+GET http://localhost:8080/tasks

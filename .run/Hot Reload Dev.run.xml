@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Hot Reload Dev" type="CompoundRunConfigurationType" factoryName="Compound">
+    <toRun name="Kotlin Classes Continuous" type="GradleRunConfiguration" />
+    <toRun name="Ktor Run" type="GradleRunConfiguration" />
+    <method v="2" />
+  </configuration>
+</component>
+

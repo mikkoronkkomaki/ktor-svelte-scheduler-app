@@ -1,0 +1,48 @@
+version: '2'
+services:
+  todo-dev-container:
+    image: kartoza/postgis:16-3.4--v2023.11.04
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: todo
+      POSTGRES_USER: todo
+      POSTGRES_PASSWORD: todo
+      ALLOW_IP_RANGE: 0.0.0.0/0
+      SHARED_PRELOAD_LIBRARIES: 'pg_cron,pg_stat_statements'
+
+  migration:
+    build: flyway-psql
+    entrypoint: |
+      /bin/bash -c "
+        until flyway -url=jdbc:postgresql://todo-dev-container/todo -user=todo -password=todo info &>/dev/null; do
+          echo Waiting for Flyway to connect to the DB...
+          sleep 0.5
+        done
+
+        # Bugin kierto https://github.com/petere/homebrew-postgresql/issues/51
+        PGGSSENCMODE=disable
+
+        echo Remove hstore extension
+        PGPASSWORD=todo psql -h todo-dev-container -p 5432 -U todo -c \"DROP EXTENSION hstore;\"
+
+        echo -e '\e[1m\e[35m--- Running migrations ---\e[0m'
+        flyway -url=jdbc:postgresql://todo-dev-container/todo -schemas=todo -locations=filesystem:/database/flyway -user=todo -password=todo migrate
+        echo -e '\e[1m\e[32m--- Migraatiot ajettu ---\e[0m'
+
+        echo -e '\e[1m\e[35m--- Ajetaan testidata ---\e[0m'
+        PGPASSWORD=todo psql -h todo-dev-container -p 5432 -U todo todo -X -a -v ON_ERROR_STOP=1 --pset pager=off -f /database/testdata/init-testdata.sql > /dev/null
+        echo -e '\e[1m\e[32m--- Testidata ajettu ---\e[0m'                    
+
+        echo -e '\e[1m\e[32m\e[5m\e[4m--- Todo DB up. Do not close this terminal window. ---\e[0m'
+        "
+
+    volumes:
+      - ../database/flyway/:/database/flyway
+      - ../database/testdata/:/database/testdata
+
+    links:
+      - todo-dev-container
+
+volumes:
+  esdata:
