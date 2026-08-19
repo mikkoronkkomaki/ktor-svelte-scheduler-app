@@ -13,7 +13,14 @@ fun Application.configureAppointmentRouting(repository: AppointmentRepository) {
     routing {
         post("/appointments") {
             val request = call.receive<CreateAppointmentRequest>()
-            val appointment = repository.create(request.description, request.done)
+            val appointment = repository.create(
+                description = request.description,
+                startTime = request.startTime,
+                endTime = request.endTime,
+                status = request.status,
+                clientId = request.clientId,
+                specialistId = request.specialistId
+            )
             call.respond(HttpStatusCode.Created, appointment)
         }
 

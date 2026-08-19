@@ -3,6 +3,7 @@ package com.example.routing
 import com.example.routing.configureAppointmentRouting
 import com.example.configureSerialization
 import com.example.model.Appointment
+import com.example.model.AppointmentStatus
 import com.example.repository.AppointmentRepository
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -23,11 +24,20 @@ class AppointmentRoutingTest {
         val repository = mockk<AppointmentRepository>()
 
         every {
-            repository.create("Learn Ktor", false)
+            repository.create(
+                description = "Learn Ktor",
+                startTime = "2026-08-19 09:00:00",
+                endTime = "2026-08-19 10:00:00",
+                status = AppointmentStatus.RESERVED,
+                clientId = null,
+                specialistId = null
+            )
         } returns Appointment(
             id = 1,
-            done = false,
-            description = "Learn Ktor"
+            description = "Learn Ktor",
+            startTime = "2026-08-19 09:00:00",
+            endTime = "2026-08-19 10:00:00",
+            status = AppointmentStatus.RESERVED
         )
 
         application {
@@ -37,17 +47,24 @@ class AppointmentRoutingTest {
 
         val response = client.post("/appointments") {
             contentType(ContentType.Application.Json)
-            setBody("""{"description":"Learn Ktor", "done": false}""")
+            setBody("""{"description":"Learn Ktor","startTime":"2026-08-19 09:00:00","endTime":"2026-08-19 10:00:00","status":"reserved"}""")
         }
 
         assertEquals(HttpStatusCode.Created, response.status)
         assertEquals(
-            """{"id":1,"description":"Learn Ktor","done":false}""",
+            """{"id":1,"description":"Learn Ktor","startTime":"2026-08-19 09:00:00","endTime":"2026-08-19 10:00:00","status":"reserved","clientId":null,"specialistId":null,"client":null,"specialist":null}""",
             response.bodyAsText()
         )
 
         verify {
-            repository.create("Learn Ktor", false)
+            repository.create(
+                description = "Learn Ktor",
+                startTime = "2026-08-19 09:00:00",
+                endTime = "2026-08-19 10:00:00",
+                status = AppointmentStatus.RESERVED,
+                clientId = null,
+                specialistId = null
+            )
         }
     }
 
@@ -56,8 +73,20 @@ class AppointmentRoutingTest {
         val repository = mockk<AppointmentRepository>()
 
         every { repository.getAll() } returns listOf(
-            Appointment(id = 1, description = "Learn Ktor", done = false),
-            Appointment(id = 2, description = "Write tests", done = true)
+            Appointment(
+                id = 1,
+                description = "Learn Ktor",
+                startTime = "2026-08-19 09:00:00",
+                endTime = "2026-08-19 10:00:00",
+                status = AppointmentStatus.RESERVED
+            ),
+            Appointment(
+                id = 2,
+                description = "Write tests",
+                startTime = "2026-08-19 11:00:00",
+                endTime = "2026-08-19 12:00:00",
+                status = AppointmentStatus.DONE
+            )
         )
 
         application {
@@ -69,7 +98,7 @@ class AppointmentRoutingTest {
 
         assertEquals(HttpStatusCode.Accepted, response.status)
         assertEquals(
-            """[{"id":1,"description":"Learn Ktor","done":false},{"id":2,"description":"Write tests","done":true}]""",
+            """[{"id":1,"description":"Learn Ktor","startTime":"2026-08-19 09:00:00","endTime":"2026-08-19 10:00:00","status":"reserved","clientId":null,"specialistId":null,"client":null,"specialist":null},{"id":2,"description":"Write tests","startTime":"2026-08-19 11:00:00","endTime":"2026-08-19 12:00:00","status":"done","clientId":null,"specialistId":null,"client":null,"specialist":null}]""",
             response.bodyAsText()
         )
 
@@ -83,7 +112,9 @@ class AppointmentRoutingTest {
         every { repository.getById(1) } returns Appointment(
             id = 1,
             description = "Learn Ktor",
-            done = false
+            startTime = "2026-08-19 09:00:00",
+            endTime = "2026-08-19 10:00:00",
+            status = AppointmentStatus.RESERVED
         )
 
         application {
@@ -95,7 +126,7 @@ class AppointmentRoutingTest {
 
         assertEquals(HttpStatusCode.Found, response.status)
         assertEquals(
-            """{"id":1,"description":"Learn Ktor","done":false}""",
+            """{"id":1,"description":"Learn Ktor","startTime":"2026-08-19 09:00:00","endTime":"2026-08-19 10:00:00","status":"reserved","clientId":null,"specialistId":null,"client":null,"specialist":null}""",
             response.bodyAsText()
         )
 

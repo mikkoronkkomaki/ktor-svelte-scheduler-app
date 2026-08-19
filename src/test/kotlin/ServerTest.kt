@@ -1,6 +1,7 @@
 package com.example
 
 import com.example.model.Appointment
+import com.example.model.AppointmentStatus
 import com.example.repository.AppointmentRepository
 import com.example.routing.configureAppointmentRouting
 import io.ktor.client.request.get
@@ -16,7 +17,13 @@ class ServerTest {
     fun `test appointments endpoint`() = testApplication {
         val repository = mockk<AppointmentRepository>()
         every { repository.getAll() } returns listOf(
-            Appointment(id = 1, description = "Learn Ktor", done = false)
+            Appointment(
+                id = 1,
+                description = "Learn Ktor",
+                startTime = "2026-08-19 09:00:00",
+                endTime = "2026-08-19 10:00:00",
+                status = AppointmentStatus.RESERVED
+            )
         )
 
         application {

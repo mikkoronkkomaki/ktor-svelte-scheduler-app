@@ -1,5 +1,6 @@
 package com.example.repository
 
+import com.example.model.AppointmentStatus
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.flywaydb.core.Flyway
@@ -68,16 +69,38 @@ class AppointmentRepositoryTest {
     
     @Test
     fun `create appointment`() {
-        val appointment = repository.create("Learn Ktor", false)
+        val appointment = repository.create(
+            description = "KTOR lessons",
+            startTime = "2026-08-19 09:00:00",
+            endTime = "2026-08-19 10:00:00",
+            status = AppointmentStatus.RESERVED,
+            clientId = null,
+            specialistId = null
+        )
 
         assertIs<Number>(appointment.id)
-        assertEquals("Learn Ktor", appointment.description)
+        assertEquals("KTOR lessons", appointment.description)
+        assertEquals(AppointmentStatus.RESERVED, appointment.status)
     }
 
     @Test
     fun `get all returns created appointments`() {
-        val created1 = repository.create("Learn Ktor", false)
-        val created2 = repository.create("Write tests", true)
+        val created1 = repository.create(
+            description = "KTOR lessons",
+            startTime = "2026-08-19 09:00:00",
+            endTime = "2026-08-19 10:00:00",
+            status = AppointmentStatus.RESERVED,
+            clientId = null,
+            specialistId = null
+        )
+        val created2 = repository.create(
+            description = "Clojure lessons",
+            startTime = "2026-08-19 11:00:00",
+            endTime = "2026-08-19 12:00:00",
+            status = AppointmentStatus.DONE,
+            clientId = null,
+            specialistId = null
+        )
 
         val appointments = repository.getAll()
 
@@ -85,28 +108,35 @@ class AppointmentRepositoryTest {
 
         val byDescription = appointments.associateBy { it.description }
 
-        val appointment1 = byDescription["Learn Ktor"]
+        val appointment1 = byDescription["KTOR lessons"]
         assertNotNull(appointment1)
         assertEquals(created1.id, appointment1.id)
-        assertEquals(false, appointment1.done)
+        assertEquals(AppointmentStatus.RESERVED, appointment1.status)
 
-        val appointment2 = byDescription["Write tests"]
+        val appointment2 = byDescription["Clojure lessons"]
         assertNotNull(appointment2)
         assertEquals(created2.id, appointment2.id)
-        assertEquals(true, appointment2.done)
+        assertEquals(AppointmentStatus.DONE, appointment2.status)
     }
 
 
     @Test
     fun `get by id returns appointment when it exists`() {
-        val created = repository.create("Find me", false)
+        val created = repository.create(
+            description = "Find me",
+            startTime = "2026-08-19 13:00:00",
+            endTime = "2026-08-19 14:00:00",
+            status = AppointmentStatus.CANCELLED,
+            clientId = null,
+            specialistId = null
+        )
 
         val found = repository.getById(created.id)
 
         assertNotNull(found)
         assertEquals(created.id, found.id)
         assertEquals("Find me", found.description)
-        assertEquals(false, found.done)
+        assertEquals(AppointmentStatus.CANCELLED, found.status)
     }
     
     @Test
