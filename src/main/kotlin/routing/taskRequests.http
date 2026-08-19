@@ -11,3 +11,8 @@ Content-Type: application/json
 ### Get tasks
 
 GET http://localhost:8080/tasks
+
+### Get task
+
+GET http://localhost:8080/tasks/14
+

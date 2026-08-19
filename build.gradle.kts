@@ -39,5 +39,9 @@ dependencies {
     testImplementation("io.ktor:ktor-client-mock:3.4.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.14.3")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.14.3")
+    testImplementation("org.testcontainers:junit-jupiter:1.20.1")
+    testImplementation("org.testcontainers:postgresql:1.20.1")
+    testImplementation("org.flywaydb:flyway-core:13.3.0")
+    testImplementation("org.flywaydb:flyway-database-postgresql:13.3.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.14.3")
 }

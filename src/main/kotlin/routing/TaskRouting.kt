@@ -13,9 +13,24 @@ fun Application.configureRouting(repository: TaskRepository) {
     routing {
         post("/tasks") {
             val request = call.receive<CreateTaskRequest>()
-            log.info("---->>> request: $request")
             val task = repository.create(request.description, request.done)
             call.respond(HttpStatusCode.Created, task)
+        }
+
+        get("/tasks") {
+            val tasks = repository.getAll()
+            call.respond(HttpStatusCode.Accepted, tasks)
+        }
+
+        get("/tasks/{id}") {
+            val taskId = call.parameters["id"]?.toIntOrNull()
+            if (taskId != null) {
+                val task = repository.getById(taskId)
+                if (task != null) {
+                    call.respond(HttpStatusCode.Found, task)
+                }
+            }
+            call.respond(HttpStatusCode.NotFound)
         }
     }
 }
