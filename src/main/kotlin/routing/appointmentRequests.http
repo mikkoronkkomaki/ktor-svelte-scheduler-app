@@ -1,0 +1,18 @@
+### Create appointment
+
+POST http://localhost:8080/appointments
+Content-Type: application/json
+
+{
+  "description": "Opettele Ktoria",
+  "done": false
+}
+
+### Get appointments
+
+GET http://localhost:8080/appointments
+
+### Get appointment
+
+GET http://localhost:8080/appointments/14
+

@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 
-data class CreateTaskRequest(
+data class CreateAppointmentRequest(
 
     val description: String,
     val done: Boolean
@@ -13,7 +13,7 @@ data class CreateTaskRequest(
 
 @Serializable
 
-data class Task(
+data class Appointment(
 
     val id: Int,
 

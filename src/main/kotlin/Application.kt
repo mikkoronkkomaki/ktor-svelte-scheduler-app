@@ -1,7 +1,7 @@
 package com.example
 
-import com.example.Routing.configureRouting
-import com.example.repository.TaskRepository
+import com.example.routing.configureAppointmentRouting
+import com.example.repository.AppointmentRepository
 import io.ktor.server.application.Application
 import io.ktor.server.netty.EngineMain
 
@@ -13,7 +13,7 @@ fun Application.module() {
     configureSerialization()
 
     val dataSource = createDataSource()
-    val taskRepository = TaskRepository(dataSource)
+    val appointmentRepository = AppointmentRepository(dataSource)
 
-    configureRouting(taskRepository)
+    configureAppointmentRouting(appointmentRepository)
 }

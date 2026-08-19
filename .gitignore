@@ -1,0 +1,12 @@
+.gradle/
+build/
+out/
+.kotlin/
+.DS_Store
+
+# Local IntelliJ files
+.idea/workspace.xml
+.idea/dataSources.local.xml
+.idea/dataSources/
+.idea/httpRequests/
+

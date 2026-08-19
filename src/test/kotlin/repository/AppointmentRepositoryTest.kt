@@ -13,7 +13,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 @Testcontainers
-class TaskRepositoryTest {
+class AppointmentRepositoryTest {
     companion object {
         @Container
         @JvmStatic
@@ -26,7 +26,7 @@ class TaskRepositoryTest {
     }
 
     private lateinit var dataSource: HikariDataSource
-    private lateinit var repository: TaskRepository
+    private lateinit var repository: AppointmentRepository
 
     @BeforeEach
     fun setUp() {
@@ -41,14 +41,14 @@ class TaskRepositoryTest {
         val flyway = Flyway.configure()
             .dataSource(dataSource)
             .locations("filesystem:dev-tools/database/flyway")
-            .schemas("todo")
+            .schemas("scheduler")
             .cleanDisabled(false)
             .load()
 
         flyway.clean()
         flyway.migrate()
 
-        repository = TaskRepository(dataSource)
+        repository = AppointmentRepository(dataSource)
     }
 
     @AfterEach
@@ -58,7 +58,7 @@ class TaskRepositoryTest {
         runCatching {
             dataSource.connection.use { connection ->
                 connection.createStatement().use {
-                    it.executeUpdate("DELETE FROM todo.task")
+                    it.executeUpdate("DELETE FROM scheduler.appointment")
                 }
             }
         }
@@ -67,38 +67,38 @@ class TaskRepositoryTest {
     }
     
     @Test
-    fun `create task`() {
-        val task = repository.create("Learn Ktor", false)
+    fun `create appointment`() {
+        val appointment = repository.create("Learn Ktor", false)
 
-        assertIs<Number>(task.id)
-        assertEquals("Learn Ktor", task.description)
+        assertIs<Number>(appointment.id)
+        assertEquals("Learn Ktor", appointment.description)
     }
 
     @Test
-    fun `get all returns created tasks`() {
+    fun `get all returns created appointments`() {
         val created1 = repository.create("Learn Ktor", false)
         val created2 = repository.create("Write tests", true)
 
-        val tasks = repository.getAll()
+        val appointments = repository.getAll()
 
-        assertEquals(2, tasks.size)
+        assertEquals(2, appointments.size)
 
-        val byDescription = tasks.associateBy { it.description }
+        val byDescription = appointments.associateBy { it.description }
 
-        val task1 = byDescription["Learn Ktor"]
-        assertNotNull(task1)
-        assertEquals(created1.id, task1.id)
-        assertEquals(false, task1.done)
+        val appointment1 = byDescription["Learn Ktor"]
+        assertNotNull(appointment1)
+        assertEquals(created1.id, appointment1.id)
+        assertEquals(false, appointment1.done)
 
-        val task2 = byDescription["Write tests"]
-        assertNotNull(task2)
-        assertEquals(created2.id, task2.id)
-        assertEquals(true, task2.done)
+        val appointment2 = byDescription["Write tests"]
+        assertNotNull(appointment2)
+        assertEquals(created2.id, appointment2.id)
+        assertEquals(true, appointment2.done)
     }
 
 
     @Test
-    fun `get by id returns task when it exists`() {
+    fun `get by id returns appointment when it exists`() {
         val created = repository.create("Find me", false)
 
         val found = repository.getById(created.id)
@@ -111,8 +111,8 @@ class TaskRepositoryTest {
     
     @Test
     fun `get by id returns null when not found`() {
-        val task = repository.getById(-1)
-        assertNull(task)
+        val appointment = repository.getById(-1)
+        assertNull(appointment)
     }
 
 }

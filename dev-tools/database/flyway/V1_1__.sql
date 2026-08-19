@@ -1,9 +1,9 @@
-CREATE SCHEMA IF NOT EXISTS todo;
+CREATE SCHEMA IF NOT EXISTS scheduler;
 
-CREATE TABLE todo.task
+CREATE TABLE scheduler.appointment
 (
     id     SERIAL  NOT NULL
-        CONSTRAINT pk_task
+        CONSTRAINT pk_appointment
             PRIMARY KEY,
     description VARCHAR NOT NULL,
     done BOOLEAN DEFAULT FALSE

@@ -18,5 +18,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ktor-todo-app"
+rootProject.name = "ktor-scheduler-app"
 

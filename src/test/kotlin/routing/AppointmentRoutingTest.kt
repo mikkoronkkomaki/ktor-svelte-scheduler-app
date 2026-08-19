@@ -1,9 +1,9 @@
 package com.example.routing
 
-import com.example.Routing.configureRouting
+import com.example.routing.configureAppointmentRouting
 import com.example.configureSerialization
-import com.example.model.Task
-import com.example.repository.TaskRepository
+import com.example.model.Appointment
+import com.example.repository.AppointmentRepository
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -17,14 +17,14 @@ import io.mockk.every
 import io.mockk.verify
 import kotlin.test.*
 
-class TaskRoutingTest {
+class AppointmentRoutingTest {
     @Test
-    fun `POST tasks creates a task`() = testApplication {
-        val repository = mockk<TaskRepository>()
+    fun `POST appointments creates an appointment`() = testApplication {
+        val repository = mockk<AppointmentRepository>()
 
         every {
             repository.create("Learn Ktor", false)
-        } returns Task(
+        } returns Appointment(
             id = 1,
             done = false,
             description = "Learn Ktor"
@@ -32,10 +32,10 @@ class TaskRoutingTest {
 
         application {
             configureSerialization()
-            configureRouting(repository)
+            configureAppointmentRouting(repository)
         }
 
-        val response = client.post("/tasks") {
+        val response = client.post("/appointments") {
             contentType(ContentType.Application.Json)
             setBody("""{"description":"Learn Ktor", "done": false}""")
         }
@@ -52,20 +52,20 @@ class TaskRoutingTest {
     }
 
     @Test
-    fun `GET tasks returns all tasks`() = testApplication {
-        val repository = mockk<TaskRepository>()
+    fun `GET appointments returns all appointments`() = testApplication {
+        val repository = mockk<AppointmentRepository>()
 
         every { repository.getAll() } returns listOf(
-            Task(id = 1, description = "Learn Ktor", done = false),
-            Task(id = 2, description = "Write tests", done = true)
+            Appointment(id = 1, description = "Learn Ktor", done = false),
+            Appointment(id = 2, description = "Write tests", done = true)
         )
 
         application {
             configureSerialization()
-            configureRouting(repository)
+            configureAppointmentRouting(repository)
         }
 
-        val response = client.get("/tasks")
+        val response = client.get("/appointments")
 
         assertEquals(HttpStatusCode.Accepted, response.status)
         assertEquals(
@@ -77,10 +77,10 @@ class TaskRoutingTest {
     }
 
     @Test
-    fun `GET task by id returns task when found`() = testApplication {
-        val repository = mockk<TaskRepository>()
+    fun `GET appointment by id returns appointment when found`() = testApplication {
+        val repository = mockk<AppointmentRepository>()
 
-        every { repository.getById(1) } returns Task(
+        every { repository.getById(1) } returns Appointment(
             id = 1,
             description = "Learn Ktor",
             done = false
@@ -88,10 +88,10 @@ class TaskRoutingTest {
 
         application {
             configureSerialization()
-            configureRouting(repository)
+            configureAppointmentRouting(repository)
         }
 
-        val response = client.get("/tasks/1")
+        val response = client.get("/appointments/1")
 
         assertEquals(HttpStatusCode.Found, response.status)
         assertEquals(
@@ -103,17 +103,17 @@ class TaskRoutingTest {
     }
 
     @Test
-    fun `GET task by id returns not found when task does not exist`() = testApplication {
-        val repository = mockk<TaskRepository>()
+    fun `GET appointment by id returns not found when appointment does not exist`() = testApplication {
+        val repository = mockk<AppointmentRepository>()
 
         every { repository.getById(999) } returns null
 
         application {
             configureSerialization()
-            configureRouting(repository)
+            configureAppointmentRouting(repository)
         }
 
-        val response = client.get("/tasks/999")
+        val response = client.get("/appointments/999")
 
         assertEquals(HttpStatusCode.NotFound, response.status)
 
@@ -121,15 +121,15 @@ class TaskRoutingTest {
     }
 
     @Test
-    fun `GET task by id returns not found when id is invalid`() = testApplication {
-        val repository = mockk<TaskRepository>(relaxed = true)
+    fun `GET appointment by id returns not found when id is invalid`() = testApplication {
+        val repository = mockk<AppointmentRepository>(relaxed = true)
 
         application {
             configureSerialization()
-            configureRouting(repository)
+            configureAppointmentRouting(repository)
         }
 
-        val response = client.get("/tasks/not-a-number")
+        val response = client.get("/appointments/not-a-number")
 
         assertEquals(HttpStatusCode.NotFound, response.status)
 

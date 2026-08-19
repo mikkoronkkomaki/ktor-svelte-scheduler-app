@@ -1,16 +1,15 @@
 package com.example.repository
 
-import com.example.model.Task
-import sun.font.GlyphLayout.done
+import com.example.model.Appointment
 import javax.sql.DataSource
 
-class TaskRepository(
+class AppointmentRepository(
     private val dataSource: DataSource
 ) {
 
-    fun create(description: String, done: Boolean): Task {
+    fun create(description: String, done: Boolean): Appointment {
         val sql = """
-            INSERT INTO todo.task (description, done)
+            INSERT INTO scheduler.appointment (description, done)
             VALUES (?, ?)
             RETURNING id, description, done
         """.trimIndent()
@@ -22,7 +21,7 @@ class TaskRepository(
                 statement.executeQuery().use { result ->
                     result.next()
 
-                    return Task(
+                    return Appointment(
                         id = result.getInt("id"),
                         description = result.getString("description"),
                         done = result.getBoolean("done")
@@ -33,36 +32,36 @@ class TaskRepository(
         }
     }
 
-    fun getAll(): List<Task> {
+    fun getAll(): List<Appointment> {
         val sql = """
             SELECT id, description, done
-            FROM todo.task
+            FROM scheduler.appointment
             """.trimIndent()
 
         dataSource.connection.use { connection ->
             connection.prepareStatement(sql).use { statement ->
                 statement.executeQuery().use { result ->
-                    val tasks = mutableListOf<Task>()
+                    val appointments = mutableListOf<Appointment>()
 
                     while (result.next()) {
-                        tasks.add(
-                            Task(
+                        appointments.add(
+                            Appointment(
                                 id = result.getInt("id"),
                                 description = result.getString("description"),
                                 done = result.getBoolean("done")
                             )
                         )
                     }
-                    return tasks
+                    return appointments
                 }
             }
         }
     }
 
-    fun getById(id: Int): Task? {
+    fun getById(id: Int): Appointment? {
         val sql = """
             SELECT id, description, done
-            FROM todo.task
+            FROM scheduler.appointment
             WHERE id = ?
         """.trimIndent()
 
@@ -71,14 +70,12 @@ class TaskRepository(
                 statement.setInt(1, id)
                 statement.executeQuery().use { resultSet ->
                     return if (resultSet.next()) {
-                        println("löyty")
-                        Task(
+                        Appointment(
                             id = resultSet.getInt("id"),
                             description = resultSet.getString("description"),
                             done = resultSet.getBoolean("done")
                         )
                     } else {
-                        println("pallit")
                         null
                     }
                 }
