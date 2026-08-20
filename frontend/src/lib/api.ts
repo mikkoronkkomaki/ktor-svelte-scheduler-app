@@ -10,6 +10,8 @@ export interface Appointment {
   status: AppointmentStatus;
   clientId?: number | null;
   specialistId?: number | null;
+  client?: Client | null;
+  specialist?: Specialist | null;
 }
 
 export interface CreateAppointmentRequest {
@@ -19,6 +21,30 @@ export interface CreateAppointmentRequest {
   status: AppointmentStatus;
   clientId?: number | null;
   specialistId?: number | null;
+}
+
+export interface Client {
+  id: number;
+  firstName: string;
+  lastName: string;
+}
+
+export interface CreateClientRequest {
+  firstName: string;
+  lastName: string;
+}
+
+export interface Specialist {
+  id: number;
+  firstName: string;
+  lastName: string;
+  profession: string;
+}
+
+export interface CreateSpecialistRequest {
+  firstName: string;
+  lastName: string;
+  profession: string;
 }
 
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
@@ -32,7 +58,6 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
     throw new Error(`API ${res.status}: ${text}`);
   }
 
-  // DELETE voi palauttaa tyhjän body:n
   if (res.status === 204) return undefined as T;
   return (await res.json()) as T;
 }
@@ -41,6 +66,24 @@ export const appointmentsApi = {
   list: () => api<Appointment[]>('/appointments'),
   create: (payload: CreateAppointmentRequest) =>
     api<Appointment>('/appointments', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+};
+
+export const clientsApi = {
+  list: () => api<Client[]>('/clients'),
+  create: (payload: CreateClientRequest) =>
+    api<Client>('/clients', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
+};
+
+export const specialistsApi = {
+  list: () => api<Specialist[]>('/specialists'),
+  create: (payload: CreateSpecialistRequest) =>
+    api<Specialist>('/specialists', {
       method: 'POST',
       body: JSON.stringify(payload)
     })
