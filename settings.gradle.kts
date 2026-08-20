@@ -18,5 +18,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ktor-scheduler-app"
+rootProject.name = "ktor-svelte-scheduler-app"
 

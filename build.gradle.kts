@@ -21,7 +21,26 @@ tasks.test {
 
 kotlin {
     jvmToolchain(21)
+
+    sourceSets {
+        main {
+            kotlin.srcDirs("backend/src/main/kotlin")
+        }
+        test {
+            kotlin.srcDirs("backend/src/test/kotlin")
+        }
+    }
 }
+
+sourceSets {
+    named("main") {
+        resources.srcDir("backend/src/main/resources")
+    }
+    named("test") {
+        resources.srcDir("backend/src/test/resources")
+    }
+}
+
 dependencies {
     implementation(ktorLibs.serialization.kotlinx.json)
     implementation(ktorLibs.server.config.yaml)
