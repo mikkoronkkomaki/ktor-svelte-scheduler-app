@@ -12,6 +12,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @Testcontainers
 class AppointmentRepositoryTest {
@@ -143,6 +144,70 @@ class AppointmentRepositoryTest {
     fun `get by id returns null when not found`() {
         val appointment = repository.getById(-1)
         assertNull(appointment)
+    }
+
+    @Test
+    fun `update modifies appointment fields`() {
+        val created = repository.create(
+            description = "Original",
+            startTime = "2026-08-19 09:00:00",
+            endTime = "2026-08-19 10:00:00",
+            status = AppointmentStatus.RESERVED,
+            clientId = null,
+            specialistId = null
+        )
+
+        val updated = repository.update(
+            id = created.id,
+            description = "Updated",
+            startTime = "2026-08-19 09:00:00",
+            endTime = "2026-08-19 10:00:00",
+            status = AppointmentStatus.DONE,
+            clientId = null,
+            specialistId = null
+        )
+
+        assertNotNull(updated)
+        assertEquals(created.id, updated.id)
+        assertEquals("Updated", updated.description)
+        assertEquals(AppointmentStatus.DONE, updated.status)
+    }
+
+    @Test
+    fun `update returns null when appointment does not exist`() {
+        val result = repository.update(
+            id = -1,
+            description = "X",
+            startTime = "2026-08-19 09:00:00",
+            endTime = "2026-08-19 10:00:00",
+            status = AppointmentStatus.RESERVED,
+            clientId = null,
+            specialistId = null
+        )
+        assertNull(result)
+    }
+
+    @Test
+    fun `delete removes appointment and returns true`() {
+        val created = repository.create(
+            description = "To be deleted",
+            startTime = "2026-08-19 09:00:00",
+            endTime = "2026-08-19 10:00:00",
+            status = AppointmentStatus.RESERVED,
+            clientId = null,
+            specialistId = null
+        )
+
+        val deleted = repository.delete(created.id)
+
+        assertTrue(deleted)
+        assertNull(repository.getById(created.id))
+    }
+
+    @Test
+    fun `delete returns false when appointment does not exist`() {
+        val deleted = repository.delete(-1)
+        assertEquals(false, deleted)
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.routing
 
 import com.example.model.CreateAppointmentRequest
+import com.example.model.UpdateAppointmentRequest
 import com.example.repository.AppointmentRepository
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.*
@@ -26,19 +27,42 @@ fun Application.configureAppointmentRouting(repository: AppointmentRepository) {
 
         get("/appointments") {
             val appointments = repository.getAll()
-            call.respond(HttpStatusCode.Accepted, appointments)
+            call.respond(HttpStatusCode.OK, appointments)
         }
 
         get("/appointments/{id}") {
-            val appointmentId = call.parameters["id"]?.toIntOrNull()
-            if (appointmentId != null) {
-                val appointment = repository.getById(appointmentId)
-                if (appointment != null) {
-                    call.respond(HttpStatusCode.Found, appointment)
-                    return@get
-                }
+            val id = call.parameters["id"]?.toIntOrNull()
+                ?: return@get call.respond(HttpStatusCode.BadRequest, "Invalid id")
+            val appointment = repository.getById(id)
+                ?: return@get call.respond(HttpStatusCode.NotFound)
+            call.respond(HttpStatusCode.OK, appointment)
+        }
+
+        put("/appointments/{id}") {
+            val id = call.parameters["id"]?.toIntOrNull()
+                ?: return@put call.respond(HttpStatusCode.BadRequest, "Invalid id")
+            val request = call.receive<UpdateAppointmentRequest>()
+            val appointment = repository.update(
+                id = id,
+                description = request.description,
+                startTime = request.startTime,
+                endTime = request.endTime,
+                status = request.status,
+                clientId = request.clientId,
+                specialistId = request.specialistId
+            ) ?: return@put call.respond(HttpStatusCode.NotFound)
+            call.respond(HttpStatusCode.OK, appointment)
+        }
+
+        delete("/appointments/{id}") {
+            val id = call.parameters["id"]?.toIntOrNull()
+                ?: return@delete call.respond(HttpStatusCode.BadRequest, "Invalid id")
+            val deleted = repository.delete(id)
+            if (deleted) {
+                call.respond(HttpStatusCode.NoContent)
+            } else {
+                call.respond(HttpStatusCode.NotFound)
             }
-            call.respond(HttpStatusCode.NotFound)
         }
     }
 }

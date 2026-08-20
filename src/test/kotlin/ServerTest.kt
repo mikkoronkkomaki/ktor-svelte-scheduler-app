@@ -31,7 +31,7 @@ class ServerTest {
             configureAppointmentRouting(repository)
         }
 
-        assertEquals(HttpStatusCode.Accepted, client.get("/appointments").status)
+        assertEquals(HttpStatusCode.OK, client.get("/appointments").status)
     }
 
 }

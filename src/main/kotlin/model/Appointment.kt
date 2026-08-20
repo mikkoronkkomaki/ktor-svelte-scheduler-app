@@ -14,6 +14,16 @@ data class CreateAppointmentRequest(
 )
 
 @Serializable
+data class UpdateAppointmentRequest(
+    val description: String,
+    val startTime: String,
+    val endTime: String,
+    val status: AppointmentStatus,
+    val clientId: Int? = null,
+    val specialistId: Int? = null
+)
+
+@Serializable
 data class Appointment(
     val id: Int,
     val description: String,
@@ -42,8 +52,34 @@ data class Client(
 )
 
 @Serializable
+data class CreateClientRequest(
+    val firstName: String,
+    val lastName: String
+)
+
+@Serializable
+data class UpdateClientRequest(
+    val firstName: String,
+    val lastName: String
+)
+
+@Serializable
 data class Specialist(
     val id: Int,
+    val firstName: String,
+    val lastName: String,
+    val profession: String
+)
+
+@Serializable
+data class CreateSpecialistRequest(
+    val firstName: String,
+    val lastName: String,
+    val profession: String
+)
+
+@Serializable
+data class UpdateSpecialistRequest(
     val firstName: String,
     val lastName: String,
     val profession: String
